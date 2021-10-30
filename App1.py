@@ -10,44 +10,66 @@ st.header('App for Forecasting')
 st.subheader('Lets try it!!!!')
 
 
-excel_file='app1.xlsx'
+#excel_file='app1.xlsx'
+#sheet_name='Sheet1'
+
+
+sheet_id='16m0FZF0PHeIhogDO8731Q42j5Gc5Y-Wh'
 sheet_name='Sheet1'
 
-df_1= pd.read_excel(excel_file, sheet_name = sheet_name, usecols='A:B', header=0)
-df_1.dropna(inplace=False)
+URL= 'https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
+   sheet_id, sheet_name)
 
-st.dataframe(df_1)
+
+#@st.cache
+#def load_data(nrows):
+ #       data=pd.read_csv(URL)
+  #      return data
+
+data=pd.read_csv(URL)
+#data_load_state = st.text('Loading Alberto pls wait')
+#data =load_data(10000)
+#data_load_state.text('Done Bro!')
+
+st.dataframe(data)
+
+#df_1= pd.read_excel(excel_file, sheet_name = sheet_name, usecols='A:B', header=0)
+#df_1.dropna(inplace=False)
+
+data.dropna(inplace=False)
+#st.dataframe(df_1)
 
 #df_1.shape
 
 #df_1.insert(2,'C1', ['x','y','z'],True)
+st.text('*Note:We can add calculated columns to existing dataframe') 
 
-#st.dataframe(df_1)
+data['Score'] = data['Rating'] * 20
+st.dataframe(data)
 
-df_1['Score'] = df_1['Rating'] * 20
-st.dataframe(df_1)
-
-bar_chart= px.bar(df_1, title = 'BAR CHART TITLE', x='Age',y='Score')
+bar_chart= px.bar(data, title = 'BAR CHART TITLE', x='Age',y='Score')
 
 st.plotly_chart(bar_chart)
 
-pie_chart= px.pie(df_1, title = 'PIE CHART TITLE', values = 'Rating', names = 'Age')
+pie_chart= px.pie(data, title = 'PIE CHART TITLE', values = 'Rating', names = 'Age')
 
 st.plotly_chart(pie_chart)
 
-image = Image.open('images/down.jpg')
-st.image(image,caption='1st image', use_column_width=True) #or width=300
+#image = Image.open('images/down.jpg')
+#st.image(image,caption='1st image', use_column_width=True) #or width=300
 
 # Filter/Group DataFrame
 
-ages=df_1['Age'].unique().tolist()
-ratings=df_1['Rating'].unique().tolist()
+st.text('*Note: Filtering and selecting the data only what we seek for')
+
+ages=data['Age'].unique().tolist()
+ratings=data['Rating'].unique().tolist()
 
 ratingselection=st.slider('Title1:',min_value=min(ratings),max_value=max(ratings),value=(min(ratings),max(ratings)))
 
 ageselection=st.multiselect('Title2:',ages, default=ages)
 
 #filter based on selection
-mask=(df_1['Rating'].between(*ratingselection)) & (df_1['Age'].isin(ageselection))
-noofresult= df_1[mask].shape[0]
+mask=(data['Rating'].between(*ratingselection)) & (data['Age'].isin(ageselection))
+noofresult= data[mask].shape[0]
 st.markdown(f'*Available results: {noofresult}*') 
